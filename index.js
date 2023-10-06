@@ -1,3 +1,6 @@
+// console clear
+console.clear();
+
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -40,11 +43,14 @@ run().catch(console.dir);
 const db = client.db("anyvesselServer");
 const boatsCollection = db.collection("boats");
 const crewCollection = db.collection("crew");
+const boatServiceCollection = db.collection("boat-service");
 
 // root route
 app.get("/", (req, res) => {
   res.send("Anyvessel is running");
 });
+
+// ==============  Boats  ============
 
 // get all boats
 app.get("/boats", async (req, res) => {
@@ -60,6 +66,8 @@ app.post("/boats", async (req, res) => {
   res.send(result);
 });
 
+// ==============  Crew  ============
+
 // get all crew
 app.get("/crew", async (req, res) => {
   const cursor = crewCollection.find();
@@ -74,6 +82,29 @@ app.post("/crew", async (req, res) => {
   res.send(result);
 });
 
+// ==============  boat Service  ============
+
+// get all crew
+app.get("/boat-service", async (req, res) => {
+  try {
+    const result = await boatServiceCollection.find().toArray();
+    res.status(200).send(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "Server Broken!" });
+  }
+});
+
+// post crew
+app.post("/boat-service", async (req, res) => {
+  const newData = req.body;
+  const result = await boatServiceCollection.insertOne(newData);
+  res.send(result);
+});
+
+// ===================================================
+
+// server listen or running
 app.listen(port, () => {
   console.log(`anyvessel Server is running ${port}`);
 });
