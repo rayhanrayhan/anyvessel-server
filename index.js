@@ -39,6 +39,7 @@ run().catch(console.dir);
 
 // data collection
 const db = client.db("anyvesselServer");
+const usersCollection = db.collection("users");
 const boatsCollection = db.collection("boats");
 const crewCollection = db.collection("crew");
 
@@ -57,6 +58,18 @@ app.get("/boats", async (req, res) => {
 // post boats
 app.post("/boats", async (req, res) => {
   const newData = req.body;
+  const query = { email: newData.email }
+  const user = {
+    email: newData.email,
+    fullName: newData.fullName,
+    phone: newData.phone,
+    picture: newData.picture,
+  }
+  const existingUser = await usersCollection.findOne(query);
+  if (existingUser) {
+    return
+  }
+  const addUser = await usersCollection.insertOne(user);
   const result = await boatsCollection.insertOne(newData);
   res.send(result);
 });
