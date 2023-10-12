@@ -104,7 +104,6 @@ app.get("/users/:email", async (req, res) => {
 // delete user
 app.delete("/user/:id", async (req, res) => {
   const id = req.params.id;
-  console.log("id", id);
 
   try {
     const objId = { _id: new ObjectId(id) };
@@ -120,7 +119,6 @@ app.delete("/user/:id", async (req, res) => {
 
       if (!result) {
         result = await boatsCollection.findOne({ email });
-        console.log("boatsCollection ", result);
         return res.status(200).send(result);
       }
 
@@ -225,7 +223,7 @@ app.post("/crew-data", async (req, res) => {
 // update crew service location
 app.patch("/crew-data-location", async (req, res) => {
   const body = req.body;
-  console.log(body);
+
   try {
     const findServiceAndUpdate = await crewServiceCollection.findOneAndUpdate(
       {
@@ -240,7 +238,7 @@ app.patch("/crew-data-location", async (req, res) => {
       }
     );
 
-    if (findServiceAndUpdate?.location?.country !== body?.country) {
+    if (findServiceAndUpdate?.location?.country === body?.country) {
       res.status(200).send(findServiceAndUpdate);
     } else {
       res.status(201).send(findServiceAndUpdate);
