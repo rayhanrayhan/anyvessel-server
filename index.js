@@ -101,24 +101,66 @@ app.get("/users/:email", async (req, res) => {
   }
 });
 
+// find one user data
+app.get("/user-data/:email", async (req, res) => {
+  const email = req.params.email;
+
+  try {
+    let user;
+    const boatsServiceUser = await boatServiceCollection.findOne({ email });
+    const boatServiceData = await boatServiceOrderCollection.findOne({
+      userEmail: email,
+    });
+    user = {
+      ...boatsServiceUser,
+      serviceData: boatServiceData,
+    };
+
+    if (boatsServiceUser) {
+      return res.status(200).send(user);
+    }
+
+    if (!boatsServiceUser) {
+      const crewD = await crewCollection.findOne({ email });
+      const crewServiceData = await crewServiceCollection.findOne({
+        userEmail: email,
+      });
+      user = { ...crewD, serviceData: crewServiceData };
+
+      if (!crewD) {
+        user = await boatsCollection.findOne({ email });
+
+        return res.status(200).send(user);
+      }
+
+      return res.status(200).send(user);
+    }
+
+    return res.status(204).send({ message: "user not fount" });
+  } catch (error) {
+    console.log(error);
+    res.status(404).send({ message: "Server Broken!" });
+  }
+});
+
 // delete user
 app.delete("/user/:id", async (req, res) => {
   const id = req.params.id;
 
   try {
     const objId = { _id: new ObjectId(id) };
-    let result;
     const boatsServiceUser = await boatServiceCollection.deleteOne(objId);
 
     if (boatsServiceUser) {
       return res.status(200).send(boatsServiceUser);
     }
 
+    let result;
     if (!boatsServiceUser) {
-      result = await crewCollection.findOne({ email });
+      result = await crewCollection.deleteOne(objId);
 
       if (!result) {
-        result = await boatsCollection.findOne({ email });
+        result = await boatsCollection.deleteOne(objId);
         return res.status(200).send(result);
       }
 
@@ -139,6 +181,20 @@ app.get("/boats", async (req, res) => {
   const cursor = boatsCollection.find();
   const result = await cursor.toArray();
   res.send(result);
+});
+
+// delete user
+app.delete("/boat/:id", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const objId = { _id: new ObjectId(id) };
+    const result = await boatsCollection.deleteOne(objId);
+    return res.status(200).send(result);
+  } catch (error) {
+    console.log(error);
+    res.status(404).send({ message: "Server Broken!" });
+  }
 });
 
 // post boats
