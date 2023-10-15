@@ -14,9 +14,7 @@ app.use(express.json());
 // MongoDB connection
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.v73g3gy.mongodb.net/?retryWrites=true&w=majority`;
-// const uri = `mongodb+srv://anyvesselServer:moBYdsTRiKIQIs1l@cluster0.v73g3gy.mongodb.net/?retryWrites=true&w=majority`;
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -47,7 +45,6 @@ const boatsOwnerAdvertisedCollection = db.collection("boatOwner-Advertised");
 const crewCollection = db.collection("crew");
 const boatServiceCollection = db.collection("boat-service");
 const boatServiceOrderCollection = db.collection("boat-service-order");
-const boatSell = db.collection("boatSell");
 const crewServiceCollection = db.collection("Crew-Service");
 
 // root routeusers
@@ -190,7 +187,7 @@ app.get("/boats", async (req, res) => {
 // get all boats
 app.get("/boat-sale-data", async (req, res) => {
   try {
-    const cursor = boatSell.find();
+    const cursor = boatsSailingCollection.find();
     const result = await cursor.toArray();
     res.status(200).send(result);
   } catch (error) {
@@ -222,6 +219,93 @@ app.post("/boats", async (req, res) => {
   };
   const result = await boatsCollection.insertOne(newData);
   res.send(result);
+});
+
+// ================   Boat Sailing All Api   ===================================
+
+app.get("/boat-sailing", async (req, res) => {
+  const result = await boatsSailingCollection.find().toArray();
+  res.send(result);
+});
+
+app.post("/boatSailing", async (req, res) => {
+  const data = req.body;
+  // console.log("data", data)
+  const result = await boatsSailingCollection.insertOne(data);
+  res.send(result);
+});
+
+// Update Sailing post Location
+
+app.patch("/boatSailing-contact", async (req, res) => {
+  const body = req.body;
+  console.log(body);
+  try {
+    const findBoatSailingAndUpdateContact =
+      await boatsSailingCollection.findOneAndUpdate(
+        {
+          ownerUserEmail: body.ownerUserEmail,
+        },
+        {
+          $set: {
+            "contact.sellerName": body?.sellerName,
+            "contact.sellerEmail": body?.sellerEmail,
+            "contact.seller_Number": body?.seller_Number,
+            "contact.seller_skype": body?.seller_skype,
+          },
+        }
+      );
+    console.log(findBoatSailingAndUpdateContact);
+    res.send(findBoatSailingAndUpdateContact);
+  } catch (error) {
+    console.log("boat-services-data", error);
+    res.status(500).send({ message: "Server Broken" });
+  }
+});
+
+// Update Sailing post Contact Info
+
+app.patch("/boatSailing-location", async (req, res) => {
+  const body = req.body;
+  console.log(body);
+  try {
+    const findBoatSailingAndUpdateLocation =
+      await boatsSailingCollection.findOneAndUpdate(
+        {
+          ownerUserEmail: body.ownerUserEmail,
+        },
+        {
+          $set: {
+            "location.boarding_country": body?.boarding_country,
+            "location.boarding_city": body?.boarding_city,
+            "location.sailing_country": body?.sailing_country,
+            "location.sailing_city": body?.sailing_city,
+          },
+        }
+      );
+    console.log(findBoatSailingAndUpdateLocation);
+    res.send(findBoatSailingAndUpdateLocation);
+  } catch (error) {
+    console.log("boat-services-data", error);
+    res.status(500).send({ message: "Server Broken" });
+  }
+});
+
+// ===================================================
+
+// post Advertised
+
+app.post("/boatOwner-advertised", async (req, res) => {
+  const body = req.body;
+  console.log(body);
+  try {
+    const data = req.body;
+    const result = await boatsOwnerAdvertisedCollection.insertOne(data);
+    res.send(result);
+  } catch (error) {
+    console.log("boat-services-data", error);
+    res.status(500).send({ message: "Server Broken" });
+  }
 });
 
 // ==============  Crew  ============
@@ -607,97 +691,6 @@ app.patch("/boat-services-data-advert", async (req, res) => {
   }
 });
 
-// ================   Boat Sailing All Api   ===================================
-
-
-app.get('/boat-sailing', async (req, res) => {
-  const result = await boatsSailingCollection.find().toArray();
-  res.send(result)
-})
-
-app.post('/boatSailing', async (req, res) => {
-  const data = req.body
-  // console.log("data", data)
-  const result = await boatsSailingCollection.insertOne(data)
-  res.send(result)
-})
-
-
-// Update Sailing post Location 
-
-app.patch('/boatSailing-contact', async (req, res) => {
-  const body = req.body;
-  console.log(body)
-  try {
-    const findBoatSailingAndUpdateContact =
-      await boatsSailingCollection.findOneAndUpdate(
-        {
-          ownerUserEmail: body.ownerUserEmail,
-        },
-        {
-          $set: {
-            "contact.sellerName": body?.sellerName,
-            "contact.sellerEmail": body?.sellerEmail,
-            "contact.seller_Number": body?.seller_Number,
-            "contact.seller_skype": body?.seller_skype
-          },
-        }
-      );
-    console.log(findBoatSailingAndUpdateContact)
-    res.send(findBoatSailingAndUpdateContact)
-  } catch (error) {
-    console.log("boat-services-data", error);
-    res.status(500).send({ message: "Server Broken" });
-  }
-})
-
-// Update Sailing post Contact Info 
-
-app.patch('/boatSailing-location', async (req, res) => {
-  const body = req.body;
-  console.log(body)
-  try {
-    const findBoatSailingAndUpdateLocation =
-      await boatsSailingCollection.findOneAndUpdate(
-        {
-          ownerUserEmail: body.ownerUserEmail,
-        },
-        {
-          $set: {
-            "location.boarding_country": body?.boarding_country,
-            "location.boarding_city": body?.boarding_city,
-            "location.sailing_country": body?.sailing_country,
-            "location.sailing_city": body?.sailing_city
-          },
-        }
-      );
-    console.log(findBoatSailingAndUpdateLocation)
-    res.send(findBoatSailingAndUpdateLocation)
-  } catch (error) {
-    console.log("boat-services-data", error);
-    res.status(500).send({ message: "Server Broken" });
-  }
-})
-
-
-
-// ===================================================
-
-
-// post Advertised 
-
-app.post('/boatOwner-advertised', async (req, res) => {
-  const body = req.body;
-  console.log(body)
-  try {
-    const data = req.body
-    const result = await boatsOwnerAdvertisedCollection.insertOne(data)
-    res.send(result)
-  } catch (error) {
-    console.log("boat-services-data", error);
-    res.status(500).send({ message: "Server Broken" });
-  }
-})
 // server listen or running
 app.listen(port, () => {
   console.log(`anyVessel Server is running ${port}`);
