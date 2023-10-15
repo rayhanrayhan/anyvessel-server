@@ -40,14 +40,17 @@ run().catch(console.dir);
 
 // data collection
 const db = client.db("anyvesselServer");
+const usersCollection = db.collection("users");
 const boatsCollection = db.collection("boats");
+const boatsSailingCollection = db.collection("boatSell");
+const boatsOwnerAdvertisedCollection = db.collection("boatOwner-Advertised");
 const crewCollection = db.collection("crew");
 const boatServiceCollection = db.collection("boat-service");
 const boatServiceOrderCollection = db.collection("boat-service-order");
 const boatSell = db.collection("boatSell");
 const crewServiceCollection = db.collection("Crew-Service");
 
-// root route
+// root routeusers
 app.get("/", (req, res) => {
   res.send("Anyvessel is running");
 });
@@ -604,9 +607,98 @@ app.patch("/boat-services-data-advert", async (req, res) => {
   }
 });
 
+// ================   Boat Sailing All Api   ===================================
+
+
+app.get('/boat-sailing', async (req, res) => {
+  const result = await boatsSailingCollection.find().toArray();
+  res.send(result)
+})
+
+app.post('/boatSailing', async (req, res) => {
+  const data = req.body
+  // console.log("data", data)
+  const result = await boatsSailingCollection.insertOne(data)
+  res.send(result)
+})
+
+
+// Update Sailing post Location 
+
+app.patch('/boatSailing-contact', async (req, res) => {
+  const body = req.body;
+  console.log(body)
+  try {
+    const findBoatSailingAndUpdateContact =
+      await boatsSailingCollection.findOneAndUpdate(
+        {
+          ownerUserEmail: body.ownerUserEmail,
+        },
+        {
+          $set: {
+            "contact.sellerName": body?.sellerName,
+            "contact.sellerEmail": body?.sellerEmail,
+            "contact.seller_Number": body?.seller_Number,
+            "contact.seller_skype": body?.seller_skype
+          },
+        }
+      );
+    console.log(findBoatSailingAndUpdateContact)
+    res.send(findBoatSailingAndUpdateContact)
+  } catch (error) {
+    console.log("boat-services-data", error);
+    res.status(500).send({ message: "Server Broken" });
+  }
+})
+
+// Update Sailing post Contact Info 
+
+app.patch('/boatSailing-location', async (req, res) => {
+  const body = req.body;
+  console.log(body)
+  try {
+    const findBoatSailingAndUpdateLocation =
+      await boatsSailingCollection.findOneAndUpdate(
+        {
+          ownerUserEmail: body.ownerUserEmail,
+        },
+        {
+          $set: {
+            "location.boarding_country": body?.boarding_country,
+            "location.boarding_city": body?.boarding_city,
+            "location.sailing_country": body?.sailing_country,
+            "location.sailing_city": body?.sailing_city
+          },
+        }
+      );
+    console.log(findBoatSailingAndUpdateLocation)
+    res.send(findBoatSailingAndUpdateLocation)
+  } catch (error) {
+    console.log("boat-services-data", error);
+    res.status(500).send({ message: "Server Broken" });
+  }
+})
+
+
+
 // ===================================================
 
+
+// post Advertised 
+
+app.post('/boatOwner-advertised', async (req, res) => {
+  const body = req.body;
+  console.log(body)
+  try {
+    const data = req.body
+    const result = await boatsOwnerAdvertisedCollection.insertOne(data)
+    res.send(result)
+  } catch (error) {
+    console.log("boat-services-data", error);
+    res.status(500).send({ message: "Server Broken" });
+  }
+})
 // server listen or running
 app.listen(port, () => {
-  console.log(`anyvessel Server is running ${port}`);
+  console.log(`anyVessel Server is running ${port}`);
 });
