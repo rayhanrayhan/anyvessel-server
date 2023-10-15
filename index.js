@@ -47,6 +47,7 @@ const boatsOwnerAdvertisedCollection = db.collection("boatOwner-Advertised");
 const crewCollection = db.collection("crew");
 const boatServiceCollection = db.collection("boat-service");
 const boatServiceOrderCollection = db.collection("boat-service-order");
+const boatSell = db.collection("boatSell");
 const crewServiceCollection = db.collection("Crew-Service");
 
 // root routeusers
@@ -184,6 +185,18 @@ app.get("/boats", async (req, res) => {
   const cursor = boatsCollection.find();
   const result = await cursor.toArray();
   res.send(result);
+});
+
+// get all boats
+app.get("/boat-sale-data", async (req, res) => {
+  try {
+    const cursor = boatSell.find();
+    const result = await cursor.toArray();
+    res.status(200).send(result);
+  } catch (error) {
+    console.log("get crew data", error);
+    res.status(500).send({ message: "Server Error" });
+  }
 });
 
 // delete user
