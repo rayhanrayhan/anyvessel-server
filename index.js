@@ -75,20 +75,20 @@ app.get("/users", async (req, res) => {
 // find one user
 app.get("/users/:email", async (req, res) => {
   const email = req.params.email;
-
+  console.log(email)
   try {
-    const boatsServiceUser = await boatServiceCollection.findOne({ email });
-
+    const boatsServiceUser = await boatServiceCollection.findOne({ email: email });
+    console.log("boatsServiceUser", boatsServiceUser)
     if (boatsServiceUser) {
       return res.status(200).send(boatsServiceUser);
     }
 
     let user;
     if (!boatsServiceUser) {
-      user = await crewCollection.findOne({ email });
+      user = await crewCollection.findOne({ email: email });
 
       if (!user) {
-        user = await boatsCollection.findOne({ email });
+        user = await boatsCollection.findOne({ email: email });
         return res.status(200).send(user);
       }
 
