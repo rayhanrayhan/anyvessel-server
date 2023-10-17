@@ -227,6 +227,11 @@ app.get("/boat-sailing", async (req, res) => {
   const result = await boatsSailingCollection.find().toArray();
   res.send(result);
 });
+app.get("/boatDetails/:id", async (req, res) => {
+  const id = req.params.id
+  const result = await boatsSailingCollection.findOne({ _id: new ObjectId(id) });
+  res.send(result);
+});
 
 app.post("/boatSailing", async (req, res) => {
   const data = req.body;
@@ -244,7 +249,7 @@ app.patch("/boatSailing-contact", async (req, res) => {
     const findBoatSailingAndUpdateContact =
       await boatsSailingCollection.findOneAndUpdate(
         {
-          ownerUserEmail: body.ownerUserEmail,
+          _id: body.newPostID,
         },
         {
           $set: {
@@ -272,7 +277,7 @@ app.patch("/boatSailing-location", async (req, res) => {
     const findBoatSailingAndUpdateLocation =
       await boatsSailingCollection.findOneAndUpdate(
         {
-          ownerUserEmail: body.ownerUserEmail,
+          _id: body.newPostID,
         },
         {
           $set: {
