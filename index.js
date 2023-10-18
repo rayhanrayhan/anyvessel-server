@@ -249,14 +249,15 @@ app.patch("/boatSailing-contact", async (req, res) => {
     const findBoatSailingAndUpdateContact =
       await boatsSailingCollection.findOneAndUpdate(
         {
-          _id: body.newPostID,
+          _id: new ObjectId(body.newPostID)
         },
         {
           $set: {
-            "contact.sellerName": body?.sellerName,
-            "contact.sellerEmail": body?.sellerEmail,
-            "contact.seller_Number": body?.seller_Number,
-            "contact.seller_skype": body?.seller_skype,
+            "contact":body
+            // "contact.sellerName": body?.sellerName,
+            // "contact.sellerEmail": body?.sellerEmail,
+            // "contact.seller_Number": body?.seller_Number,
+            // "contact.seller_skype": body?.seller_skype,
           },
         }
       );
@@ -272,19 +273,20 @@ app.patch("/boatSailing-contact", async (req, res) => {
 
 app.patch("/boatSailing-location", async (req, res) => {
   const body = req.body;
-  console.log(body);
+  console.log("body" , body.newPostID);
   try {
     const findBoatSailingAndUpdateLocation =
       await boatsSailingCollection.findOneAndUpdate(
         {
-          _id: body.newPostID,
+          _id: new ObjectId(body.newPostID)
         },
         {
           $set: {
-            "location.boarding_country": body?.boarding_country,
-            "location.boarding_city": body?.boarding_city,
-            "location.sailing_country": body?.sailing_country,
-            "location.sailing_city": body?.sailing_city,
+            "location":body
+            // "location.boarding_country": body?.boarding_country,
+            // "location.boarding_city": body?.boarding_city,
+            // "location.sailing_country": body?.sailing_country,
+            // "location.sailing_city": body?.sailing_city,
           },
         }
       );
