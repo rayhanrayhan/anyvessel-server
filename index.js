@@ -36,7 +36,7 @@ async function run() {
 }
 run().catch(console.dir);
 
-// data collection
+// database collection
 const db = client.db("anyvesselServer");
 const usersCollection = db.collection("users");
 const boatsCollection = db.collection("boats");
@@ -75,12 +75,10 @@ app.get("/users", async (req, res) => {
 // find one user
 app.get("/users/:email", async (req, res) => {
   const email = req.params.email;
-  console.log(email);
   try {
     const boatsServiceUser = await boatServiceCollection.findOne({
       email: email,
     });
-    console.log("boatsServiceUser", boatsServiceUser);
     if (boatsServiceUser) {
       return res.status(200).send(boatsServiceUser);
     }
@@ -223,15 +221,18 @@ app.post("/boats", async (req, res) => {
   res.send(result);
 });
 
-// ================   Boat Sailing All Api   ===================================
+// ================ Boat Sailing All Api   ==================
 
 app.get("/boat-sailing", async (req, res) => {
   const result = await boatsSailingCollection.find().toArray();
   res.send(result);
 });
+
 app.get("/boatDetails/:id", async (req, res) => {
-  const id = req.params.id
-  const result = await boatsSailingCollection.findOne({ _id: new ObjectId(id) });
+  const id = req.params.id;
+  const result = await boatsSailingCollection.findOne({
+    _id: new ObjectId(id),
+  });
   res.send(result);
 });
 
@@ -251,11 +252,11 @@ app.patch("/boatSailing-contact", async (req, res) => {
     const findBoatSailingAndUpdateContact =
       await boatsSailingCollection.findOneAndUpdate(
         {
-          _id: new ObjectId(body.newPostID)
+          _id: new ObjectId(body.newPostID),
         },
         {
           $set: {
-            "contact":body
+            contact: body,
           },
         }
       );
@@ -271,16 +272,16 @@ app.patch("/boatSailing-contact", async (req, res) => {
 
 app.patch("/boatSailing-location", async (req, res) => {
   const body = req.body;
-  console.log("body" , body.newPostID);
+  console.log("body", body.newPostID);
   try {
     const findBoatSailingAndUpdateLocation =
       await boatsSailingCollection.findOneAndUpdate(
         {
-          _id: new ObjectId(body.newPostID)
+          _id: new ObjectId(body.newPostID),
         },
         {
           $set: {
-            "location":body
+            location: body,
           },
         }
       );
@@ -526,6 +527,19 @@ app.get("/boat-service", async (req, res) => {
     const result = await boatServiceOrderCollection.find().toArray();
     const totalBoatService = result.length;
     res.status(200).send({ totalBoatService, boatService: result });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "Server Broken!" });
+  }
+});
+
+// get boat server delete
+app.get("/boat-service/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const objId = { _id: new ObjectId(id) };
+    const result = await boatServiceOrderCollection.findOne(objId);
+    res.status(200).send(result);
   } catch (error) {
     console.log(error);
     res.status(500).send({ message: "Server Broken!" });
