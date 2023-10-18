@@ -346,7 +346,7 @@ app.get("/crew-data", async (req, res) => {
 
 // get all crew data
 app.get("/crew-data/:id", async (req, res) => {
-  console.log(id);
+  const id = req.params.id;
   try {
     const objId = { _id: new ObjectId(id) };
     const result = await crewServiceCollection.findOne(objId);
