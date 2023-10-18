@@ -75,10 +75,12 @@ app.get("/users", async (req, res) => {
 // find one user
 app.get("/users/:email", async (req, res) => {
   const email = req.params.email;
-  console.log(email)
+  console.log(email);
   try {
-    const boatsServiceUser = await boatServiceCollection.findOne({ email: email });
-    console.log("boatsServiceUser", boatsServiceUser)
+    const boatsServiceUser = await boatServiceCollection.findOne({
+      email: email,
+    });
+    console.log("boatsServiceUser", boatsServiceUser);
     if (boatsServiceUser) {
       return res.status(200).send(boatsServiceUser);
     }
@@ -344,6 +346,19 @@ app.get("/crew-data", async (req, res) => {
     const result = await crewServiceCollection.find().toArray();
     const totalCrew = result.length;
     return res.status(200).send({ totalCrew, crews: result });
+  } catch (error) {
+    console.log("get crew data", error);
+    res.status(500).send({ message: "Server Error" });
+  }
+});
+
+// get all crew data
+app.get("/crew-data/:id", async (req, res) => {
+  console.log(id);
+  try {
+    const objId = { _id: new ObjectId(id) };
+    const result = await crewServiceCollection.findOne(objId);
+    return res.status(200).send(result);
   } catch (error) {
     console.log("get crew data", error);
     res.status(500).send({ message: "Server Error" });
