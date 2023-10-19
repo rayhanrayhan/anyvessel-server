@@ -72,7 +72,7 @@ app.get("/users", async (req, res) => {
 
     return res.status(200).send({ totalUsers, users });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(404).send({ message: "Server Broken!" });
   }
 });
@@ -102,7 +102,7 @@ app.get("/users/:email", async (req, res) => {
 
     return res.status(204).send({ message: "user not fount" });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(404).send({ message: "Server Broken!" });
   }
 });
@@ -144,7 +144,7 @@ app.get("/user-data/:email", async (req, res) => {
 
     return res.status(204).send({ message: "user not fount" });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(404).send({ message: "Server Broken!" });
   }
 });
@@ -175,7 +175,7 @@ app.delete("/user/:id", async (req, res) => {
 
     return res.status(204).send({ message: "user not fount" });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(404).send({ message: "Server Broken!" });
   }
 });
@@ -184,9 +184,14 @@ app.delete("/user/:id", async (req, res) => {
 
 // get all boats
 app.get("/boats", async (req, res) => {
-  const cursor = boatsCollection.find();
-  const result = await cursor.toArray();
-  res.send(result);
+  try {
+    const cursor = boatsCollection.find();
+    const result = await cursor.toArray();
+    res.send(result);
+  } catch (error) {
+    // console.log(error);
+    res.status(404).send({ message: "Server Broken!" });
+  }
 });
 
 // Single boats
@@ -198,7 +203,7 @@ app.get("/boat/:id", async (req, res) => {
     const result = await boatsCollection.findOne(objId);
     return res.status(200).send(result);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(404).send({ message: "Server Broken!" });
   }
 });
@@ -210,7 +215,7 @@ app.get("/boat-sale-data", async (req, res) => {
     const result = await cursor.toArray();
     res.status(200).send(result);
   } catch (error) {
-    console.log("get crew data", error);
+    // console.log("get crew data", error);
     res.status(500).send({ message: "Server Error" });
   }
 });
@@ -224,7 +229,7 @@ app.delete("/boat/:id", async (req, res) => {
     const result = await boatsCollection.deleteOne(objId);
     return res.status(200).send(result);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(404).send({ message: "Server Broken!" });
   }
 });
@@ -265,7 +270,7 @@ app.post("/boatSailing", async (req, res) => {
 // Update Sailing post Location
 app.patch("/boatSailing-contact", async (req, res) => {
   const body = req.body;
-  console.log(body);
+
   try {
     const findBoatSailingAndUpdateContact =
       await boatsSailingCollection.findOneAndUpdate(
@@ -278,10 +283,10 @@ app.patch("/boatSailing-contact", async (req, res) => {
           },
         }
       );
-    console.log(findBoatSailingAndUpdateContact);
+
     res.send(findBoatSailingAndUpdateContact);
   } catch (error) {
-    console.log("boat-services-data", error);
+    // console.log("boat-services-data", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -289,7 +294,7 @@ app.patch("/boatSailing-contact", async (req, res) => {
 // Update Sailing post Contact Info
 app.patch("/boatSailing-location", async (req, res) => {
   const body = req.body;
-  console.log("body", body.newPostID);
+
   try {
     const findBoatSailingAndUpdateLocation =
       await boatsSailingCollection.findOneAndUpdate(
@@ -302,10 +307,10 @@ app.patch("/boatSailing-location", async (req, res) => {
           },
         }
       );
-    console.log(findBoatSailingAndUpdateLocation);
+
     res.send(findBoatSailingAndUpdateLocation);
   } catch (error) {
-    console.log("boat-services-data", error);
+    // console.log("boat-services-data", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -315,13 +320,13 @@ app.patch("/boatSailing-location", async (req, res) => {
 // post Advertised
 app.post("/boatOwner-advertised", async (req, res) => {
   const body = req.body;
-  console.log(body);
+
   try {
     const data = req.body;
     const result = await boatsOwnerAdvertisedCollection.insertOne(data);
     res.send(result);
   } catch (error) {
-    console.log("boat-services-data", error);
+    // console.log("boat-services-data", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -356,7 +361,7 @@ app.get("/crew-data", async (req, res) => {
     const totalCrew = result.length;
     return res.status(200).send({ totalCrew, crews: result });
   } catch (error) {
-    console.log("get crew data", error);
+    // console.log("get crew data", error);
     res.status(500).send({ message: "Server Error" });
   }
 });
@@ -369,7 +374,7 @@ app.get("/crew-data/:id", async (req, res) => {
     const result = await crewServiceCollection.findOne(objId);
     return res.status(200).send(result);
   } catch (error) {
-    console.log("get crew data", error);
+    // console.log("get crew data", error);
     res.status(500).send({ message: "Server Error" });
   }
 });
@@ -382,7 +387,7 @@ app.delete("/crew-data/:id", async (req, res) => {
     const result = await crewServiceCollection.deleteOne(objId);
     res.status(200).send(result);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).send({ message: "Server Broken!" });
   }
 });
@@ -402,7 +407,7 @@ app.post("/crew-data", async (req, res) => {
       return res.status(201).send({ message: "already Data submitted" });
     }
   } catch (error) {
-    console.log("crew-data", error);
+    // console.log("crew-data", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -431,7 +436,7 @@ app.patch("/crew-data-location", async (req, res) => {
       res.status(201).send(findServiceAndUpdate);
     }
   } catch (error) {
-    console.log("boat-services-data", error);
+    // console.log("boat-services-data", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -463,7 +468,7 @@ app.patch("/crew-data-contact", async (req, res) => {
       res.status(201).send(findServerContactAndUpdate);
     }
   } catch (error) {
-    console.log("boat-services-data", error);
+    // console.log("boat-services-data", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -501,7 +506,7 @@ app.patch("/crew-data-service", async (req, res) => {
       res.status(201).send(findServiceAndUpdate);
     }
   } catch (error) {
-    console.log("crew-data-service", error);
+    // console.log("crew-data-service", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -509,7 +514,6 @@ app.patch("/crew-data-service", async (req, res) => {
 // update service advert
 app.patch("/crew-data-advert", async (req, res) => {
   const body = req.body;
-  console.log(body);
 
   try {
     const findServiceAdvertAndUpdate =
@@ -530,7 +534,7 @@ app.patch("/crew-data-advert", async (req, res) => {
       res.status(201).send(findServiceAdvertAndUpdate);
     }
   } catch (error) {
-    console.log("boat-services-data", error);
+    // console.log("boat-services-data", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -544,7 +548,7 @@ app.get("/boat-service", async (req, res) => {
     const totalBoatService = result.length;
     res.status(200).send({ totalBoatService, boatService: result });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).send({ message: "Server Broken!" });
   }
 });
@@ -557,7 +561,7 @@ app.get("/boat-service/:id", async (req, res) => {
     const result = await boatServiceOrderCollection.findOne(objId);
     res.status(200).send(result);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).send({ message: "Server Broken!" });
   }
 });
@@ -570,20 +574,25 @@ app.delete("/boat-service-delete/:id", async (req, res) => {
     const result = await boatServiceOrderCollection.deleteOne(objId);
     res.status(200).send(result);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(500).send({ message: "Server Broken!" });
   }
 });
 
 // post boat server
 app.post("/boat-service", async (req, res) => {
-  const body = req.body;
-  const newData = {
-    ...body,
-    role: "boatServices",
-  };
-  const result = await boatServiceUserCls.insertOne(newData);
-  res.send(result);
+  try {
+    const body = req.body;
+    const newData = {
+      ...body,
+      role: "boatServices",
+    };
+    const result = await boatServiceUserCls.insertOne(newData);
+    res.send(result);
+  } catch (error) {
+    // console.log("boat-service", error);
+    res.status(500).send({ message: "Server Broken" });
+  }
 });
 
 // post boat server or order
@@ -601,7 +610,7 @@ app.post("/boat-services-data", async (req, res) => {
       return res.status(201).send({ message: "already Data submitted" });
     }
   } catch (error) {
-    console.log("boat-services-data", error);
+    // console.log("boat-services-data", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -630,7 +639,7 @@ app.patch("/boat-services-data-location", async (req, res) => {
       res.status(201).send(findServiceOderAndUpdate);
     }
   } catch (error) {
-    console.log("boat-services-data", error);
+    // console.log("boat-services-data", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -662,7 +671,7 @@ app.patch("/boat-services-data-contact", async (req, res) => {
       res.status(201).send(findServiceOderAndUpdate);
     }
   } catch (error) {
-    console.log("boat-services-data", error);
+    // console.log("boat-services-data", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -702,7 +711,7 @@ app.patch("/boat-services-data-service", async (req, res) => {
       res.status(201).send(findServiceOderAndUpdate);
     }
   } catch (error) {
-    console.log("boat-services-data", error);
+    // console.log("boat-services-data", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -730,7 +739,7 @@ app.patch("/boat-services-data-advert", async (req, res) => {
       res.status(201).send(findServiceOderAndUpdate);
     }
   } catch (error) {
-    console.log("boat-services-data", error);
+    // console.log("boat-services-data", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
