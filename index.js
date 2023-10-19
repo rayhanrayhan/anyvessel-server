@@ -39,15 +39,20 @@ run().catch(console.dir);
 // database collection
 const db = client.db("anyvesselServer");
 const usersCollection = db.collection("users");
+// boat collection
 const boatsCollection = db.collection("boats");
+// boat sailing collection
 const boatsSailingCollection = db.collection("boatSell");
+// boat Owner Advertised Collection
 const boatsOwnerAdvertisedCollection = db.collection("boatOwner-Advertised");
-const crewCollection = db.collection("crew");
-const boatServiceCollection = db.collection("boat-service");
-const boatServiceOrderCollection = db.collection("boat-service-order");
+// Crew Collection
 const crewServiceCollection = db.collection("Crew-Service");
+const crewCollection = db.collection("crew");
+// boat service collection
+const boatServiceUserCls = db.collection("boat-service");
+const boatServiceOrderCollection = db.collection("boat-service-order");
 
-// root routeusers
+// root route
 app.get("/", (req, res) => {
   res.send("Anyvessel is running");
 });
@@ -59,7 +64,7 @@ app.get("/users", async (req, res) => {
   try {
     const boatsUser = await boatsCollection.find().toArray();
     const crewUser = await crewCollection.find().toArray();
-    const boatsServiceUser = await boatServiceCollection.find().toArray();
+    const boatsServiceUser = await boatServiceUserCls.find().toArray();
 
     let users = [...boatsServiceUser, ...crewUser, ...boatsUser];
 
@@ -76,7 +81,7 @@ app.get("/users", async (req, res) => {
 app.get("/users/:email", async (req, res) => {
   const email = req.params.email;
   try {
-    const boatsServiceUser = await boatServiceCollection.findOne({
+    const boatsServiceUser = await boatServiceUserCls.findOne({
       email: email,
     });
     if (boatsServiceUser) {
@@ -108,7 +113,7 @@ app.get("/user-data/:email", async (req, res) => {
 
   try {
     let user;
-    const boatsServiceUser = await boatServiceCollection.findOne({ email });
+    const boatsServiceUser = await boatServiceUserCls.findOne({ email });
     const boatServiceData = await boatServiceOrderCollection.findOne({
       userEmail: email,
     });
@@ -150,7 +155,7 @@ app.delete("/user/:id", async (req, res) => {
 
   try {
     const objId = { _id: new ObjectId(id) };
-    const boatsServiceUser = await boatServiceCollection.deleteOne(objId);
+    const boatsServiceUser = await boatServiceUserCls.deleteOne(objId);
 
     if (boatsServiceUser) {
       return res.status(200).send(boatsServiceUser);
@@ -182,6 +187,20 @@ app.get("/boats", async (req, res) => {
   const cursor = boatsCollection.find();
   const result = await cursor.toArray();
   res.send(result);
+});
+
+// Single boats
+app.get("/boat/:id", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const objId = { _id: new ObjectId(id) };
+    const result = await boatsCollection.findOne(objId);
+    return res.status(200).send(result);
+  } catch (error) {
+    console.log(error);
+    res.status(404).send({ message: "Server Broken!" });
+  }
 });
 
 // get all boats
@@ -244,7 +263,6 @@ app.post("/boatSailing", async (req, res) => {
 });
 
 // Update Sailing post Location
-
 app.patch("/boatSailing-contact", async (req, res) => {
   const body = req.body;
   console.log(body);
@@ -269,7 +287,6 @@ app.patch("/boatSailing-contact", async (req, res) => {
 });
 
 // Update Sailing post Contact Info
-
 app.patch("/boatSailing-location", async (req, res) => {
   const body = req.body;
   console.log("body", body.newPostID);
@@ -296,7 +313,6 @@ app.patch("/boatSailing-location", async (req, res) => {
 // ===================================================
 
 // post Advertised
-
 app.post("/boatOwner-advertised", async (req, res) => {
   const body = req.body;
   console.log(body);
@@ -566,7 +582,7 @@ app.post("/boat-service", async (req, res) => {
     ...body,
     role: "boatServices",
   };
-  const result = await boatServiceCollection.insertOne(newData);
+  const result = await boatServiceUserCls.insertOne(newData);
   res.send(result);
 });
 
