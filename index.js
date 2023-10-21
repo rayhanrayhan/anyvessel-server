@@ -259,6 +259,11 @@ app.get("/boatDetails/:id", async (req, res) => {
   });
   res.send(result);
 });
+app.get("/boatSailingPost/:email", async (req, res) => {
+  const email = req.params.email;
+  const result = await boatsSailingCollection.find({ownerUserEmail: email}).toArray();
+  res.send(result);
+});
 
 app.post("/boatSailing", async (req, res) => {
   const data = req.body;
