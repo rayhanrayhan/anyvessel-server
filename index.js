@@ -812,6 +812,74 @@ app.patch("/boat/basic", async (req, res) => {
 }
 )
 
+app.patch("/crew/basic", async (req, res) => {
+
+  // const attorneyId = req.params.id;
+  const { 
+    email,
+    fullName,
+    // nationality,
+    phone,
+    // languages,
+    // description
+   } = req.body;
+  try {
+    // Use findByIdAndUpdate to update the document
+
+    const updateCrewDetails = await crewCollection.findOneAndUpdate(
+      { email: email },
+      {
+        $set: {
+          fullName: fullName,
+          // nationality: nationality,
+          phone: phone,
+          // languages: languages,
+          // description: description
+        },
+      }
+    )
+
+    res.status(200).json(updateCrewDetails);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+)
+
+app.patch("/boat-service/basic", async (req, res) => {
+
+
+  const { 
+    email,
+    fullName,
+    // nationality,
+    phone,
+    // languages,
+    // description
+   } = req.body;
+  try {
+    // Use findByIdAndUpdate to update the document
+
+    const updateCrewDetails = await boatServiceCollection.findOneAndUpdate(
+      { email: email },
+      {
+        $set: {
+          fullName: fullName,
+          // nationality: nationality,
+          phone: phone,
+          // languages: languages,
+          // description: description
+        },
+      }
+    )
+
+    res.status(200).json(updateCrewDetails);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+)
+
 
 
 // server listen or running
