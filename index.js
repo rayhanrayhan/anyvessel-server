@@ -261,7 +261,7 @@ app.get("/boatDetails/:id", async (req, res) => {
 });
 app.get("/boatSailingPost/:email", async (req, res) => {
   const email = req.params.email;
-  const result = await boatsSailingCollection.find({ownerUserEmail: email}).toArray();
+  const result = await boatsSailingCollection.find({ ownerUserEmail: email }).toArray();
   res.send(result);
 });
 
@@ -271,6 +271,14 @@ app.post("/boatSailing", async (req, res) => {
   const result = await boatsSailingCollection.insertOne(data);
   res.send(result);
 });
+
+// app.get("/boatSailing/:email", async (req, res) => {
+//   // console.log("data", data)
+//   const email=req.params.email;
+//   const query={ow}
+//   const result = await boatsSailingCollection.insertOne(data);
+//   res.send(result);
+// });
 
 // Update Sailing post Location
 app.patch("/boatSailing-contact", async (req, res) => {
@@ -748,6 +756,156 @@ app.patch("/boat-services-data-advert", async (req, res) => {
     res.status(500).send({ message: "Server Broken" });
   }
 });
+
+
+// Update Boat Profile
+app.patch("/update-boat-cover", async (req, res) => {
+
+  const updateData = req.body;
+  try {
+    // Use findByIdAndUpdate to update the document
+
+    const updateBoatCoverData = await boatsCollection.findOneAndUpdate(
+      { email: updateData.email },
+      {
+        $set: {
+          picture: updateData.url,
+        },
+      }
+    )
+
+    res.status(200).json(updateBoatCoverData);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+)
+// Update Boat Profile
+app.patch("/update-boat-profile", async (req, res) => {
+
+  // const attorneyId = req.params.id;
+  const updateData = req.body;
+  console.log("updateData", updateData)
+  try {
+    // Use findByIdAndUpdate to update the document
+
+    const updateBoatData = await boatsCollection.findOneAndUpdate(
+      { email: updateData.email },
+      {
+        $set: {
+          identityPhoto: updateData.url,
+        },
+      }
+    )
+
+    res.status(200).json(updateBoatData);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+)
+// Update Boat Profile
+app.patch("/boat/basic", async (req, res) => {
+
+  // const attorneyId = req.params.id;
+  const { email,
+    fullName,
+    nationality,
+    phone,
+    languages,
+    description } = req.body;
+  try {
+    // Use findByIdAndUpdate to update the document
+
+    const updateBoatDetails = await boatsCollection.findOneAndUpdate(
+      { email: email },
+      {
+        $set: {
+          fullName: fullName,
+          nationality: nationality,
+          phone: phone,
+          languages: languages,
+          description: description
+        },
+      }
+    )
+
+    res.status(200).json(updateBoatDetails);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+)
+
+app.patch("/crew/basic", async (req, res) => {
+
+  // const attorneyId = req.params.id;
+  const { 
+    email,
+    fullName,
+    // nationality,
+    phone,
+    // languages,
+    // description
+   } = req.body;
+  try {
+    // Use findByIdAndUpdate to update the document
+
+    const updateCrewDetails = await crewCollection.findOneAndUpdate(
+      { email: email },
+      {
+        $set: {
+          fullName: fullName,
+          // nationality: nationality,
+          phone: phone,
+          // languages: languages,
+          // description: description
+        },
+      }
+    )
+
+    res.status(200).json(updateCrewDetails);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+)
+
+app.patch("/boat-service/basic", async (req, res) => {
+
+
+  const { 
+    email,
+    fullName,
+    // nationality,
+    phone,
+    // languages,
+    // description
+   } = req.body;
+  try {
+    // Use findByIdAndUpdate to update the document
+
+    const updateCrewDetails = await boatServiceCollection.findOneAndUpdate(
+      { email: email },
+      {
+        $set: {
+          fullName: fullName,
+          // nationality: nationality,
+          phone: phone,
+          // languages: languages,
+          // description: description
+        },
+      }
+    )
+
+    res.status(200).json(updateCrewDetails);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+)
+
+
 
 // server listen or running
 app.listen(port, () => {
