@@ -41,6 +41,7 @@ const db = client.db("anyvesselServer");
 const usersCollection = db.collection("users");
 // boat collection
 const boatsCollection = db.collection("boats");
+const boatsOwnerGallery = db.collection("boat-owner-photos");
 // boat sailing collection
 const boatsSailingCollection = db.collection("boatSell");
 // boat Owner Advertised Collection
@@ -245,6 +246,99 @@ app.post("/boats", async (req, res) => {
   res.send(result);
 });
 
+// Profile Update
+app.patch("/profile-updates/:id", async (req, res) => {
+  const { id } = req.params;
+  const updatedData = req.body;
+
+  console.log("updatedData -> ", updatedData);
+  console.log("update email -> ", id);
+  // Checking the user
+
+  const query = { _id: new ObjectId(id) };
+  const updateDoc = { $set: updatedData };
+  const result = await usersCollection.updateOne(query, updateDoc);
+
+  res.send(result);
+});
+
+// create or update gallery image
+app.post("/gallery", async (req, res) => {
+  const body = req.body;
+  console.log("gallery body -> ", body);
+  try {
+    if (!body?.userId) {
+      return res.status(404).json({ message: "User Id Required" });
+    }
+
+    // if gallery id
+    if (body?.galleryId) {
+      const query = { userId: body?.userId };
+      console.log("query -> ", query);
+      const updateDoc = {
+        $set: {
+          vesselImages: body?.vesselImages,
+        },
+      };
+      const UpdateResult = await boatsOwnerGallery.findOneAndUpdate(
+        query,
+        updateDoc,
+        { upsert: true }
+      );
+      return res
+        .status(202)
+        .json({ message: "update successful!", data: UpdateResult });
+    }
+
+    const newData = {
+      ...body,
+    };
+
+    const result = await boatsOwnerGallery.insertOne(newData);
+    if (result?.insertedId) {
+      const findGalleryData = await boatsOwnerGallery.findOne({
+        userId: body?.userId,
+      });
+      return res.status(201).json({
+        message: "gallery save and data get success!",
+        data: {
+          created: result,
+          gallery: findGalleryData,
+        },
+      });
+    }
+    return res.status(200).send(result);
+  } catch (error) {
+    console.log(`app.post("/gallery", `, error);
+    return res.status(303).json("Server Broken");
+  }
+});
+
+// find Gallery Data
+app.get("/gallery/:userId", async (req, res) => {
+  const userId = req?.params?.userId;
+  console.log("gallery body -> ", userId);
+
+  try {
+    if (!userId) {
+      return res.status(404).json({ message: "User Id Required" });
+    }
+
+    const findGalleryData = await boatsOwnerGallery.findOne({
+      userId,
+    });
+    return res.status(201).json({
+      message: "gallery data getting success!",
+      data: {
+        gallery: findGalleryData,
+      },
+    });
+  } catch (error) {
+    console.log(`app.post("/gallery", `, error);
+    return res.status(303).json("Server Broken");
+  }
+});
+
 // ================ Boat Sailing All Api   ==================
 
 app.get("/boat-sailing", async (req, res) => {
@@ -261,7 +355,9 @@ app.get("/boatDetails/:id", async (req, res) => {
 });
 app.get("/boatSailingPost/:email", async (req, res) => {
   const email = req.params.email;
-  const result = await boatsSailingCollection.find({ ownerUserEmail: email }).toArray();
+  const result = await boatsSailingCollection
+    .find({ ownerUserEmail: email })
+    .toArray();
   res.send(result);
 });
 
@@ -271,14 +367,6 @@ app.post("/boatSailing", async (req, res) => {
   const result = await boatsSailingCollection.insertOne(data);
   res.send(result);
 });
-
-// app.get("/boatSailing/:email", async (req, res) => {
-//   // console.log("data", data)
-//   const email=req.params.email;
-//   const query={ow}
-//   const result = await boatsSailingCollection.insertOne(data);
-//   res.send(result);
-// });
 
 // Update Sailing post Location
 app.patch("/boatSailing-contact", async (req, res) => {
@@ -757,10 +845,8 @@ app.patch("/boat-services-data-advert", async (req, res) => {
   }
 });
 
-
 // Update Boat Profile
 app.patch("/update-boat-cover", async (req, res) => {
-
   const updateData = req.body;
   try {
     // Use findByIdAndUpdate to update the document
@@ -772,20 +858,18 @@ app.patch("/update-boat-cover", async (req, res) => {
           picture: updateData.url,
         },
       }
-    )
+    );
 
     res.status(200).json(updateBoatCoverData);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
-}
-)
+});
 // Update Boat Profile
 app.patch("/update-boat-profile", async (req, res) => {
-
   // const attorneyId = req.params.id;
   const updateData = req.body;
-  console.log("updateData", updateData)
+  console.log("updateData", updateData);
   try {
     // Use findByIdAndUpdate to update the document
 
@@ -796,24 +880,18 @@ app.patch("/update-boat-profile", async (req, res) => {
           identityPhoto: updateData.url,
         },
       }
-    )
+    );
 
     res.status(200).json(updateBoatData);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
-}
-)
+});
 // Update Boat Profile
 app.patch("/boat/basic", async (req, res) => {
-
   // const attorneyId = req.params.id;
-  const { email,
-    fullName,
-    nationality,
-    phone,
-    languages,
-    description } = req.body;
+  const { email, fullName, nationality, phone, languages, description } =
+    req.body;
   try {
     // Use findByIdAndUpdate to update the document
 
@@ -825,29 +903,27 @@ app.patch("/boat/basic", async (req, res) => {
           nationality: nationality,
           phone: phone,
           languages: languages,
-          description: description
+          description: description,
         },
       }
-    )
+    );
 
     res.status(200).json(updateBoatDetails);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
-}
-)
+});
 
 app.patch("/crew/basic", async (req, res) => {
-
   // const attorneyId = req.params.id;
-  const { 
+  const {
     email,
     fullName,
     // nationality,
     phone,
     // languages,
     // description
-   } = req.body;
+  } = req.body;
   try {
     // Use findByIdAndUpdate to update the document
 
@@ -862,26 +938,23 @@ app.patch("/crew/basic", async (req, res) => {
           // description: description
         },
       }
-    )
+    );
 
     res.status(200).json(updateCrewDetails);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
-}
-)
+});
 
 app.patch("/boat-service/basic", async (req, res) => {
-
-
-  const { 
+  const {
     email,
     fullName,
     // nationality,
     phone,
     // languages,
     // description
-   } = req.body;
+  } = req.body;
   try {
     // Use findByIdAndUpdate to update the document
 
@@ -896,16 +969,13 @@ app.patch("/boat-service/basic", async (req, res) => {
           // description: description
         },
       }
-    )
+    );
 
     res.status(200).json(updateCrewDetails);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
-}
-)
-
-
+});
 
 // server listen or running
 app.listen(port, () => {
