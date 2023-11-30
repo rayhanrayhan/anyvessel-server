@@ -42,6 +42,7 @@ const usersCollection = db.collection("users");
 // boat collection
 const boatsCollection = db.collection("boats");
 const boatsOwnerGallery = db.collection("boat-owner-photos");
+const blogPost = db.collection("blog-post");
 // boat sailing collection
 const boatsSailingCollection = db.collection("boatSell");
 // boat Owner Advertised Collection
@@ -265,7 +266,6 @@ app.patch("/profile-updates/:id", async (req, res) => {
 // create or update gallery image
 app.post("/gallery", async (req, res) => {
   const body = req.body;
-  console.log("gallery body -> ", body);
   try {
     if (!body?.userId) {
       return res.status(404).json({ message: "User Id Required" });
@@ -324,17 +324,57 @@ app.get("/gallery/:userId", async (req, res) => {
       return res.status(404).json({ message: "User Id Required" });
     }
 
-    const findGalleryData = await boatsOwnerGallery.findOne({
-      userId,
-    });
+    const findGalleryData = await boatsOwnerGallery.findOne({ userId: userId });
     return res.status(201).json({
       message: "gallery data getting success!",
-      data: {
-        gallery: findGalleryData,
-      },
+      data: findGalleryData,
     });
   } catch (error) {
     console.log(`app.post("/gallery", `, error);
+    return res.status(303).json("Server Broken");
+  }
+});
+
+// create or update blog post image
+app.post("/post-create", async (req, res) => {
+  const body = req.body;
+  try {
+    if (!body?.userId) {
+      return res.status(404).json({ message: "User Id Required" });
+    }
+
+    const newData = {
+      ...body,
+    };
+
+    const result = await blogPost.insertOne(newData);
+    return res.status(201).json({
+      message: "post create success!",
+      data: result,
+    });
+  } catch (error) {
+    console.log(`app.post("/post-create" `, error);
+    return res.status(303).json("Server Broken");
+  }
+});
+
+// find blog Post Data
+app.get("/get-posts/:userId", async (req, res) => {
+  const userId = req?.params?.userId;
+  console.log("post body -> ", userId);
+
+  try {
+    if (!userId) {
+      return res.status(404).json({ message: "User Id Required" });
+    }
+
+    const findPostData = await blogPost.find({ userId }).toArray();
+    return res.status(201).json({
+      message: "post data getting success!",
+      data: findPostData,
+    });
+  } catch (error) {
+    console.log(`app.get("/post/ `, error);
     return res.status(303).json("Server Broken");
   }
 });
