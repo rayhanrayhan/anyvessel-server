@@ -252,10 +252,7 @@ app.patch("/profile-updates/:id", async (req, res) => {
   const { id } = req.params;
   const updatedData = req.body;
 
-  console.log("updatedData -> ", updatedData);
-  console.log("update email -> ", id);
   // Checking the user
-
   const query = { _id: new ObjectId(id) };
   const updateDoc = { $set: updatedData };
   const result = await usersCollection.updateOne(query, updateDoc);
@@ -274,7 +271,6 @@ app.post("/gallery", async (req, res) => {
     // if gallery id
     if (body?.galleryId) {
       const query = { userId: body?.userId };
-      console.log("query -> ", query);
       const updateDoc = {
         $set: {
           vesselImages: body?.vesselImages,
@@ -309,7 +305,7 @@ app.post("/gallery", async (req, res) => {
     }
     return res.status(200).send(result);
   } catch (error) {
-    console.log(`app.post("/gallery", `, error);
+    // console.log(`app.post("/gallery", `, error);
     return res.status(303).json("Server Broken");
   }
 });
@@ -317,7 +313,6 @@ app.post("/gallery", async (req, res) => {
 // find Gallery Data
 app.get("/gallery/:userId", async (req, res) => {
   const userId = req?.params?.userId;
-  console.log("gallery body -> ", userId);
 
   try {
     if (!userId) {
@@ -330,7 +325,7 @@ app.get("/gallery/:userId", async (req, res) => {
       data: findGalleryData,
     });
   } catch (error) {
-    console.log(`app.post("/gallery", `, error);
+    // console.log(`app.post("/gallery", `, error);
     return res.status(303).json("Server Broken");
   }
 });
@@ -353,7 +348,7 @@ app.post("/post-create", async (req, res) => {
       data: result,
     });
   } catch (error) {
-    console.log(`app.post("/post-create" `, error);
+    // console.log(`app.post("/post-create" `, error);
     return res.status(303).json("Server Broken");
   }
 });
@@ -361,8 +356,6 @@ app.post("/post-create", async (req, res) => {
 // find blog Post Data
 app.get("/get-posts/:userId", async (req, res) => {
   const userId = req?.params?.userId;
-  console.log("post body -> ", userId);
-
   try {
     if (!userId) {
       return res.status(404).json({ message: "User Id Required" });
@@ -374,7 +367,7 @@ app.get("/get-posts/:userId", async (req, res) => {
       data: findPostData,
     });
   } catch (error) {
-    console.log(`app.get("/post/ `, error);
+    // console.log(`app.get("/post/ `, error);
     return res.status(303).json("Server Broken");
   }
 });
@@ -403,7 +396,6 @@ app.get("/boatSailingPost/:email", async (req, res) => {
 
 app.post("/boatSailing", async (req, res) => {
   const data = req.body;
-  // console.log("data", data)
   const result = await boatsSailingCollection.insertOne(data);
   res.send(result);
 });
