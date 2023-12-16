@@ -330,6 +330,70 @@ app.get("/gallery/:userId", async (req, res) => {
   }
 });
 
+// gallery image favorite toggle
+app.put("/gallery-img-loved-update/:objId/:imgId", async (req, res) => {
+  const { objId, imgId } = req.params;
+  const { loved } = req.body;
+
+  try {
+    if (!objId || !imgId) {
+      return res.status(400).json({
+        message: "objId, imgId, and loved are required in the request",
+      });
+    }
+
+    // Update the "loved" property for the matching object in the array
+    const lovedUpdated = await boatsOwnerGallery.updateOne(
+      {
+        _id: new ObjectId(objId),
+        "vesselImages.id": imgId,
+      },
+      {
+        $set: {
+          "vesselImages.$.loved": loved,
+        },
+      }
+    );
+
+    return res.status(200).json({
+      message: "Loved property updated successfully",
+      lovedUpdated,
+    });
+  } catch (error) {
+    console.error(`app.put("/gallery-img-update, `, error);
+    return res.status(500).json("Server Error");
+  }
+});
+
+// find Gallery Data
+app.delete("/gallery-img-delete/:userId/:imgId", async (req, res) => {
+  const { userId, imgId } = req?.params;
+  console.log("userId -> ", userId);
+  console.log("imgId -> ", imgId);
+
+  try {
+    if (!userId) {
+      return res.status(404).json({ message: "UserId or imgId Required" });
+    }
+
+    const result = await boatsOwnerGallery.updateOne(
+      { userId },
+      { $pull: { vesselImages: { id: parseInt(imgId) } } }
+    );
+
+    console.log("result ", result);
+
+    if (result?.modifiedCount === 1) {
+      return res.status(200).send("VesselImage deleted successfully");
+    } else {
+      return res.status(404).send("VesselImage not found");
+    }
+  } catch (error) {
+    console.log(`app.delete("/gallery-img-delete, `, error);
+    return res.status(303).json("Server Broken");
+  }
+});
+
 // create or update blog post image
 app.post("/post-create", async (req, res) => {
   const body = req.body;
@@ -443,7 +507,7 @@ app.patch("/boatSailing-location", async (req, res) => {
 
     res.send(findBoatSailingAndUpdateLocation);
   } catch (error) {
-    // console.log("boat-services-data", error);
+    // console.log("boatSailing-location", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -459,7 +523,7 @@ app.post("/boatOwner-advertised", async (req, res) => {
     const result = await boatsOwnerAdvertisedCollection.insertOne(data);
     res.send(result);
   } catch (error) {
-    // console.log("boat-services-data", error);
+    // console.log("boatOwner-advertised", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -569,7 +633,7 @@ app.patch("/crew-data-location", async (req, res) => {
       res.status(201).send(findServiceAndUpdate);
     }
   } catch (error) {
-    // console.log("boat-services-data", error);
+    // console.log("crew-data-location", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -601,7 +665,7 @@ app.patch("/crew-data-contact", async (req, res) => {
       res.status(201).send(findServerContactAndUpdate);
     }
   } catch (error) {
-    // console.log("boat-services-data", error);
+    // console.log("crew-data-contact", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
@@ -667,7 +731,7 @@ app.patch("/crew-data-advert", async (req, res) => {
       res.status(201).send(findServiceAdvertAndUpdate);
     }
   } catch (error) {
-    // console.log("boat-services-data", error);
+    // console.log("crew-data-advert", error);
     res.status(500).send({ message: "Server Broken" });
   }
 });
