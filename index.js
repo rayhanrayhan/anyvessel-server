@@ -417,6 +417,33 @@ app.post("/post-create", async (req, res) => {
   }
 });
 
+// update blog post
+app.patch("/blog-post-cart-update", async (req, res) => {
+  const body = req.body;
+
+  try {
+    if (!body?.postId) {
+      return res.status(404).json({ message: "Post Id Required" });
+    }
+
+    const query = { _id: new ObjectId(body?.postId) };
+    const updateDoc = { $set: { description: body?.description } };
+    const result = await blogPost.updateOne(query, updateDoc);
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    return res.status(200).json({
+      message: "Post update success!",
+      data: result,
+    });
+  } catch (error) {
+    console.log(`app.patch("/blog-post-cart-update" `, error);
+    return res.status(500).json("Server Error");
+  }
+});
+
 // find blog Post Data
 app.get("/get-posts/:userId", async (req, res) => {
   const userId = req?.params?.userId;
@@ -433,6 +460,18 @@ app.get("/get-posts/:userId", async (req, res) => {
   } catch (error) {
     // console.log(`app.get("/post/ `, error);
     return res.status(303).json("Server Broken");
+  }
+});
+
+app.delete("/blog-post-cart-delete/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const objId = { _id: new ObjectId(id) };
+    const result = await blogPost.deleteOne(objId);
+    res.status(200).send(result);
+  } catch (error) {
+    // console.log(error);
+    res.status(500).send({ message: "Server Broken!" });
   }
 });
 
